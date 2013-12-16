@@ -93,4 +93,16 @@ describe 'Sequel Upsert' do
       up.column_type(:username).should == 'TEXT'
     end
   end
+
+  describe '#unique_name' do
+    it 'sets the name' do
+      up = upsert({ username: 'testing' }, { color: 'green', size: 'small' })
+      up.unique_name.should include('users_sel_username_set_color_a_size')
+    end
+
+    it 'sets the name to an md5 when its greater then MAX_NAME_LENGTH' do
+      up = upsert({ field1: 1, field2: 2, field3: 3 }, { field: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6 })
+      up.unique_name.should include('1aaaa1e4038790eaa620e89ce117e142')
+    end
+  end
 end

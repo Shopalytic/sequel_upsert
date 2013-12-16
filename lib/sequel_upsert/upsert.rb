@@ -1,3 +1,5 @@
+require 'digest'
+
 module SequelUpsert
   NAME_PREFIX = "upsert_#{ VERSION.gsub('.', '_') }"
   MAX_NAME_LENGTH = 62
@@ -37,7 +39,7 @@ module SequelUpsert
       ].join('_')
 
       if parts.length > MAX_NAME_LENGTH
-        [NAME_PREFIX, table_name, Digest::MD5.digest(parts)].join('_')
+        [NAME_PREFIX, table_name, Digest::MD5.hexdigest(parts)].join('_')
       else
         parts
       end
