@@ -112,7 +112,7 @@ describe 'Sequel Upsert' do
 
     it 'sets the name to an md5 when its greater then MAX_NAME_LENGTH' do
       up = upsert({ field1: 1, field2: 2, field3: 3 }, { field: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6 })
-      up.unique_name.should include('1aaaa1e4038790eaa620e89ce117e142')
+      up.unique_name.should match /upsert_(\d+)_(\d+)_(\d+)_(\w+){16}/
     end
   end
 end
