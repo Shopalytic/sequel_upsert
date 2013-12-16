@@ -73,10 +73,17 @@ describe 'Sequel Upsert' do
     end
 
     it 'should only create one stored procedure when the param order changes' do
-      up = upsert({ username: 'testing' }, { color: 'green', size: 'small' }).create_procedure
+      upsert({ username: 'testing' }, { color: 'green', size: 'small' }).create_procedure
       upsert({ username: 'testing' }, { size: 'small', color: 'green' }).create_procedure
 
       procs.count.should == 1
+    end
+
+    it 'creates multiple stored procedures when the params are different' do
+      upsert({ username: 'testing' }, { size: 'small' }).create_procedure
+      upsert({ username: 'testing' }, { size: 'small', color: 'green' }).create_procedure
+
+      procs.count.should == 2
     end
   end
 
