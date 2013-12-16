@@ -59,23 +59,33 @@ module SequelUpsert
       Hash[setter_fields.map { |k, v| [k, Sequel.lit(set_name(k, SET_POSTFIX))] }]
     end
 
-    def column_type(field)
-      column_definitions.find { |c| c[0] == field }[1][:db_type].upcase
+    def column_definition(field)
+      column_definitions.find { |c| c[0] == field }[1]
     end
 
     def setter_function_definitions
-      setter_fields.map { |k, v| set_name(k, SET_POSTFIX) + ' ' + column_type(k) }
+      setter_fields.map { |k, v| set_name(k, SET_POSTFIX) + ' ' + column_definition(k)[:db_type].upcase }
     end
 
     def selector_function_definitions
-      selector_fields.map { |k, v| set_name(k, SEL_POSTFIX) + ' ' + column_type(k) }
+      selector_fields.map { |k, v| set_name(k, SEL_POSTFIX) + ' ' + column_definition(k)[:db_type].upcase }
+    end
+
+    def process_literals(fields)
+      Hash[fields.map { |k, v|
+        if v.is_a?(Sequel::LiteralString) && v.to_sym.downcase == :default
+          [k, column_definition(k)[:ruby_default]]
+        else
+          [k, v]
+        end
+      }]
     end
 
     def create_procedure
       first_try = true
 
       db.run(%{
-        CREATE OR REPLACE FUNCTION #{ unique_name } (#{ (setter_function_definitions + selector_function_definitions).join(', ') }) RETURNS VOID AS
+        CREATE OR REPLACE FUNCTION #{ unique_name } (#{ (selector_function_definitions + setter_function_definitions).join(', ') }) RETURNS VOID AS
         $$
         DECLARE
           first_try INTEGER := 1;
@@ -117,7 +127,7 @@ module SequelUpsert
     end # / create_procedure
 
     def execute
-      sel = Sequel.function(unique_name, *setter_fields.values, selector_fields.values)
+      sel = Sequel.function(unique_name, *(process_literals(selector_fields).values + process_literals(setter_fields).values))
       db.select { sel }.first
     end
 

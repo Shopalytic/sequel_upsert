@@ -13,7 +13,8 @@ describe 'Sequel Upsert' do
     DB.create_table(:users) do
       String :username, unique: true
       String :color
-      String :size
+      String :size, default: 'large'
+      Integer :counter, default: 1
     end
   end
 
@@ -51,6 +52,21 @@ describe 'Sequel Upsert' do
       row[:username].should == 'testing'
       row[:color].should == 'green'
       row[:size].should == 'small'
+    end
+
+    it 'should force a default value' do
+      DB[:users].upsert({ username: 'testing' }, { color: 'green', size: Sequel.lit('default') })
+
+      row = DB[:users].first
+      row[:size].should == 'large'
+    end
+
+    it 'sets a solumn that already exists back to the default' do
+      DB[:users].upsert({ username: 'testing' }, { size: 'medium' })
+      DB[:users].upsert({ username: 'testing' }, { color: 'green', size: Sequel.lit('default') })
+
+      row = DB[:users].first
+      row[:size].should == 'large'
     end
   end
 
@@ -97,10 +113,12 @@ describe 'Sequel Upsert' do
     end
   end
 
-  describe '#column_type' do
+  describe '#column_definition' do
     it 'finds the db type of a column' do
       up = upsert({ username: 'testing' }, {})
-      up.column_type(:username).should == 'TEXT'
+      column = up.column_definition(:size)
+      column[:db_type].should == 'text'
+      column[:ruby_default].should == 'large'
     end
   end
 
