@@ -51,24 +51,32 @@ module SequelUpsert
       end
     end
 
+    def set_names(fields, postfix)
+      Hash[fields.map { |k, v| [k, Sequel.lit(set_name(k, postfix))] }]
+    end
+
     def set_sel_names
-      Hash[selector_fields.map { |k, v| [k, Sequel.lit(set_name(k, SEL_POSTFIX))] }]
+      set_names(selector_fields, SEL_POSTFIX)
     end
 
     def set_set_names
-      Hash[setter_fields.map { |k, v| [k, Sequel.lit(set_name(k, SET_POSTFIX))] }]
+      set_names(setter_fields, SET_POSTFIX)
     end
 
     def column_definition(field)
       column_definitions.find { |c| c[0] == field }[1]
     end
 
+    def function_definitions(fields, postfix)
+      fields.map { |k, v| set_name(k, postfix) + ' ' + column_definition(k)[:db_type].upcase }
+    end
+
     def setter_function_definitions
-      setter_fields.map { |k, v| set_name(k, SET_POSTFIX) + ' ' + column_definition(k)[:db_type].upcase }
+      function_definitions(setter_fields, SET_POSTFIX)
     end
 
     def selector_function_definitions
-      selector_fields.map { |k, v| set_name(k, SEL_POSTFIX) + ' ' + column_definition(k)[:db_type].upcase }
+      function_definitions(selector_fields, SEL_POSTFIX)
     end
 
     def process_literals(fields)
