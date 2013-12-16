@@ -62,6 +62,16 @@ describe 'Sequel Upsert' do
     it "raises ArgumentError when setter_fields isn't a hash" do
       expect{ upsert({}, 'invalid') }.to raise_error(ArgumentError, '"setter_fields" must be a hash')
     end
+
+    context 'table_name' do
+      it 'sets from a symbol' do
+        upsert({}, {}).table_name.should == 'users'
+      end
+
+      it 'sets from a qualified identifier' do
+        SequelUpsert::Upsert.new(DB[Sequel.qualify(:users, :public)], {}, {}).table_name.should == 'public__users'
+      end
+    end
   end
 
   describe '#create_procedure' do

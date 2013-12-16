@@ -20,8 +20,14 @@ module SequelUpsert
 
       @dataset = dataset
       @db = dataset.db
-      @table_name = dataset.first_source.to_s
-      @column_definitions = db.schema(dataset.first_source)
+
+      if dataset.first_source.is_a?(Sequel::SQL::QualifiedIdentifier)
+        @table_name = "#{ dataset.first_source.column }__#{ dataset.first_source.table }"
+      else
+        @table_name = dataset.first_source.to_s
+      end
+
+      @column_definitions = db.schema(@table_name.to_sym)
     end
 
     def set_name(field, postfix)
