@@ -22,7 +22,7 @@ module SequelUpsert
       @db = dataset.db
 
       if dataset.first_source.is_a?(Sequel::SQL::QualifiedIdentifier)
-        @table_name = "#{ dataset.first_source.column }__#{ dataset.first_source.table }"
+        @table_name = "#{ dataset.first_source.table }__#{ dataset.first_source.column }"
       else
         @table_name = dataset.first_source.to_s
       end

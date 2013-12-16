@@ -68,8 +68,8 @@ describe 'Sequel Upsert' do
         upsert({}, {}).table_name.should == 'users'
       end
 
-      it 'sets from a qualified identifier' do
-        SequelUpsert::Upsert.new(DB[Sequel.qualify(:users, :public)], {}, {}).table_name.should == 'public__users'
+      it 'accepts a QualifiedIdentifier with a schema and table' do
+        SequelUpsert::Upsert.new(DB[Sequel.qualify(:public, :users)], {}, {}).table_name.should == 'public__users'
       end
     end
   end
