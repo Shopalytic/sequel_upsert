@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.email = "adam@shopalytic.com"
   s.platform = Gem::Platform::RUBY
   s.summary = "Sequel upsert support for PostgreSQL"
+  s.description = "Sequel upsert support for PostgreSQL"
   s.files = Dir.glob("{lib}/**/*") + %w(README.md MIT-LICENSE)
   s.test_files = Dir.glob("{spec}/**/*")
   s.require_paths = ['lib']
