@@ -64,7 +64,9 @@ module SequelUpsert
     end
 
     def column_definition(field)
-      column_definitions.find { |c| c[0] == field }[1]
+        col = column_definitions.find { |c| c[0] == field }
+        raise IndexError, "#{ field } not found in column definition list" unless col
+        col[1]
     end
 
     def function_definitions(fields, postfix)

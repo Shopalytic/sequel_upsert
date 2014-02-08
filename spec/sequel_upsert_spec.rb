@@ -120,6 +120,11 @@ describe 'Sequel Upsert' do
       column[:db_type].should == 'text'
       column[:ruby_default].should == 'large'
     end
+
+    it 'raises IndexError when field is not in the definition list' do
+      up = upsert({ username: 'testing' }, {})
+      expect { up.column_definition(:not_found) }.to_raise(IndexError, 'not_found not found in the column definition list')
+    end
   end
 
   describe '#unique_name' do
