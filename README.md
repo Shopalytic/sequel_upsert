@@ -1,3 +1,5 @@
+Making changes!
+
 # Sequel Upsert
 
 Adds upsert support to Sequel when used with PostgreSQL. The code is highly influenced by [https://github.com/seamusabshere/upsert](https://github.com/seamusabshere/upsert) but has been re-written to integrate cleanly with Sequel and be accessible from Sequel::Dataset.
